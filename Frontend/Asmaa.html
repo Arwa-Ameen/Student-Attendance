@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>تسجيل الحضور - د. أسماء</title>
+    <style>
+    
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Cairo", sans-serif;
+        background: linear-gradient(to left, #0d0e35, #e6eef2);
+        color: #333;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: #fff;
+        max-width: 400px;
+        width: 100%;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 1.5rem;
+        color: #0d0e35;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #555;
+      }
+
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #06066e;
+        border-radius: 6px;
+        background-color: #e1eaf3;
+        font-size: 1rem;
+        transition: border-color 0.3s, background-color 0.3s;
+      }
+      select:hover {
+        border-color: #8f90ac;
+        background-color: #f4faf4;
+      }
+
+      select:focus {
+        outline: none;
+        border-color: #0d0e35;
+        background-color: #fff;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        background-color: #1a1b52;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
+      }
+
+      button:hover {
+        background-color: #8282b9;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      #result {
+        margin-top: 20px;
+        text-align: center;
+        min-height: 1.2em;
+        font-size: 1rem;
+      }
+
+      .success {
+        color: #28a745;
+      }
+
+      .error {
+        color: #dc3545;
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 20px;
+        }
+        select,
+        button {
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>تسجيل الحضور - د. أسماء</h2>
+      <form id="attendanceForm">
+        <div class="form-group">
+          <label for="subject">اختر المادة:</label>
+          <select id="subject" name="subject">
+            <option value="">-- اختر --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="slot">اختر الموعد:</label>
+          <select id="slot" name="slot">
+            <option value="">-- اختر --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="student">اختر الطالب:</label>
+          <select id="student" name="student">
+            <option value="">-- اختر --</option>
+          </select>
+        </div>
+        <button type="submit">تسجيل الحضور</button>
+      </form>
+      <div id="result"></div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "http://localhost:5256";
+      const doctorName = "Asmaa";
+
+      const subjectDropdown = document.getElementById("subject");
+      const slotDropdown = document.getElementById("slot");
+      const studentDropdown = document.getElementById("student");
+      const resultDiv = document.getElementById("result");
+
+      const subjectsByDoctor = {
+        "د. أسماء": ["MultiMedia", "Graphics"],
+      };
+      const slotsBySubject = {
+        MultiMedia: ["16:00"],
+        Graphics: ["12:00", "14:00"],
+      };
+
+      
+      subjectsByDoctor["د. أسماء"].forEach((sub) => {
+        const opt = document.createElement("option");
+        opt.value = sub;
+        opt.text = sub;
+        subjectDropdown.appendChild(opt);
+      });
+
+      // On subject change
+      subjectDropdown.addEventListener("change", () => {
+        slotDropdown.innerHTML = '<option value="">-- اختر --</option>';
+        studentDropdown.innerHTML = '<option value="">-- اختر --</option>';
+        const sel = subjectDropdown.value;
+        if (sel && slotsBySubject[sel]) {
+          slotsBySubject[sel].forEach((slot) => {
+            const opt = document.createElement("option");
+            opt.value = slot;
+            opt.text = slot;
+            slotDropdown.appendChild(opt);
+          });
+        }
+      });
+
+      // On slot change
+      slotDropdown.addEventListener("change", async () => {
+        const subject = subjectDropdown.value;
+        const slot = slotDropdown.value;
+        studentDropdown.innerHTML = "<option>-- جاري التحميل --</option>";
+        resultDiv.innerHTML = "";
+        if (!subject || !slot) return;
+        const fmt = slot.replace(":", "-");
+        try {
+          const res = await fetch(
+            `${API_BASE_URL}/api/Attendance/students?doctorName=${doctorName}&subjectName=${subject}&sectionStartTime=${fmt}`
+          );
+          if (!res.ok) throw new Error();
+          const list = await res.json();
+         const attendedIds = list.attendedStudentIds || []; 
+
+          studentDropdown.innerHTML = '<option value="">-- اختر --</option>';
+
+          // Loop over IDs, use the same index to get the matching name
+          for (let i = 0; i < list.studentIds.length; i++) {
+            const id = list.studentIds[i];
+            const name = list.studentNames[i];
+            if (attendedIds.includes(id)) continue;
+            const opt = document.createElement("option");
+            opt.value = id; // studentId as the option value
+            opt.text = name; // studentName as the displayed text
+            opt.dataset.name = name;
+            studentDropdown.appendChild(opt);
+          }
+        } catch {
+          resultDiv.innerHTML =
+            '<span class="error">فشل في تحميل أسماء الطلبة.</span>';
+        }
+      });
+////////////////////////////////////////////////////////////////////////////////////////
+
+function startCountdown(minutes, redirectUrl) {
+    const endTime = new Date().getTime() + minutes * 60 * 1000;
+    localStorage.setItem("lockUntil", endTime);
+
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const diff = endTime - now;
+
+      if (diff <= 0) {
+        clearInterval(interval);
+        localStorage.removeItem("lockUntil");
+        window.location.href = redirectUrl;
+      } else {
+        const mins = Math.floor(diff / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        resultDiv.innerHTML = `<span class="error">تم التسجيل! انتظر ${mins}:${secs
+          .toString()
+          .padStart(2, "0")} دقيقة قبل التسجيل مرة أخرى.</span>`;
+      }
+    }, 1000);
+  }
+ 
+  window.addEventListener("load", () => {
+  const lockUntil = localStorage.getItem("lockUntil");
+  const now = Date.now();
+
+  if (lockUntil) {
+    const lockTime = Number(lockUntil);
+    if (now >= lockTime) {
+      localStorage.removeItem("lockUntil");
+      window.location.href = "welcome.html";
+    } else {
+      document.getElementById("attendanceForm").style.display = "none";
+      const remainingMs = lockTime - now;
+      const remainingMinutes = Math.floor(remainingMs / (1000 * 60));
+      startCountdown(remainingMinutes, "welcome.html");
+    }
+  }
+});
+  
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+      // On submit
+      document
+        .getElementById("attendanceForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          resultDiv.innerHTML = "";
+          const sel = studentDropdown.selectedOptions[0];
+          if (!sel || !sel.value) {
+            resultDiv.innerHTML =
+              '<span class="error">الرجاء اختيار الطالب.</span>';
+            return;
+          }
+          ////////////////////////////////////////////////
+
+      const subject = subjectDropdown.value;
+      const slot = slotDropdown.value;
+      const studentId = sel.value;
+      const studentName = sel.dataset.name;
+
+      //check current time
+      const [hh, mm] = slot.split(":").map(Number);
+      const sectionStart = new Date();
+      sectionStart.setHours(hh, mm, 0, 0);
+
+      const now = new Date();
+      const diffMinutes = (now - sectionStart) / (1000 * 60);
+      if (diffMinutes < 0) {
+       resultDiv.innerHTML =
+       '<span class="error">لم يبدأ السكشن بعد. لا يمكنك التسجيل الآن.</span>';
+      return;
+}
+      if (diffMinutes > 15) {
+        resultDiv.innerHTML =
+          '<span class="error">الغياب مسموح فقط في أول 15 دقيقة من بداية السكشن.</span>';
+        return;
+      }
+
+
+          //////////////////////////////////////////////////////
+          const data = {
+            doctorName,
+            subjectName: subjectDropdown.value,
+            sectionStartTime: slotDropdown.value,
+            studentId: sel.value,
+            studentName: sel.dataset.name,
+          };
+          console.log(data);
+
+          try {
+  const r = await fetch(`${API_BASE_URL}/api/attendance`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  const text = await r.text();
+  if (!r.ok) {
+    resultDiv.innerHTML = `<span class="error">${text}</span>`;
+    return;
+  }
+ 
+  resultDiv.innerHTML = `<span class="success">${text}</span>`;
+        document.getElementById("attendanceForm").style.display = "none";
+        
+        startCountdown(30, "welcome.html");
+      } catch {
+        resultDiv.innerHTML =
+          '<span class="error">حدث خطأ غير متوقع. حاول لاحقًا.</span>';
+      }
+        });
+    </script>
+  </body>
+</html>

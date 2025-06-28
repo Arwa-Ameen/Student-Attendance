@@ -1,0 +1,44 @@
+[
+  {
+    "ContainingType": "StudentsAttendance.Controllers.AttendanceController",
+    "Method": "RecordAttendance",
+    "RelativePath": "api/Attendance",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "StudentsAttendance.AttendanceRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "StudentsAttendance.Controllers.AttendanceController",
+    "Method": "GetStudentLists",
+    "RelativePath": "api/Attendance/students",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "doctorName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "subjectName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "sectionStartTime",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

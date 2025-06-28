@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>مرحبا بكم</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Cairo", sans-serif;
+        background: linear-gradient(to left, #0d0e35, #e6eef2);
+        display: flex;
+        height: 100vh;
+        direction: ltr;
+        flex-direction: row-reverse;
+      }
+
+      /* ده الـ div اللي هيكون فيه الكلام دلوقتي */
+      .left {
+        /* الخلفية دي كانت للـ div بتاع الصورة، هتخليها للكلام */
+        background: linear-gradient(to bottom, #ffffff, #a7b9c2);
+        width: 50%;
+        display: flex;
+        flex-direction: column; /* عشان العناصر جوه الـ div ده تبقى تحت بعض */
+        justify-content: center;
+        align-items: center;
+        padding: 50px; /* ضفنا بادينج زي اللي كان في الـ right */
+        color: white; /* لون الكلام هيكون أبيض عشان الخلفية الغامقة */
+      }
+
+      /* ده الـ div اللي هيكون فيه الصورة دلوقتي */
+      .right {
+        /* الخلفية دي كانت للـ div بتاع الكلام، هتخليها للصورة */
+        background: linear-gradient(to bottom, #091735, #000609);
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .left h1 {
+        background-color: #0d0e35;
+        color: #f8f8fb;
+        padding: 10px 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+
+      .left p {
+        color: red;
+        margin-bottom: 50px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .left button {
+        padding: 15px 30px;
+        font-size: 18px;
+        background-color: #0d0e35;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .left button:hover {
+        background-color: #1f1f5a;
+      }
+
+      .right img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="left">
+      <h1>!! مرحبا بكم</h1>
+      <p>
+        تنبيه - هذه الصفحه مخصصه لتسجيل حضور الطلاب للسكاشن العملي وليس لها اي
+        علاقه بالمحاضرات
+      </p>
+      <button onclick="window.location.href='Home.html'">اضغط للمتابعه</button>
+    </div>
+    <div class="right">
+      <img src="img/logo.jpg" alt="شعار الكلية" />
+    </div>
+  </body>
+</html>

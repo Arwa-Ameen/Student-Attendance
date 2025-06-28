@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "CGZKbqrpviyzSoDLbvwa/jVaIgT7ugSyAN47+9JA9Eo=",
+  "Source": "StudentsAttendance",
+  "BasePath": "_content/StudentsAttendance",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
